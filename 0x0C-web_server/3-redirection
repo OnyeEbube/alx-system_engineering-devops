@@ -4,9 +4,9 @@
 #sudo apt-get update
 #sudo apt-get install -y nginx
 sudo chmod -R 755 /var/www/
-sudo echo "Hello World" > /var/www/html/index.html
+echo "Hello World" > /var/www/html/index.html
 sudo chmod 766 /etc/nginx/sites-available/default
-sudo printf %s "server {
+printf %s "server {
     listen 80;
     listen [::]:80 default_server;
     root   /var/www/html;
