@@ -1,46 +1,28 @@
 #!/usr/bin/env bash
-# Installs HAProxy version 1.8 with the following configurations:
-#+    Enables management via the init script.
-#+    Distributes requests using a round-robin algorithm.
+# Create a script to install and configure HAProxy on lb-01 server
+# Configure HAProxy to send traffic to web-01 and web-02 servers
+# Distribute requests using a roundrobin algorithm
+# Make sure that HAProxy can be managed via an init script
+# Install and configure HAproxy on my lb-01 server.
+sudo apt-get -y update
+apt-get -y install haproxy
 
-# Install HAProxy
-sudo apt-get update
-sudo apt-get install -y haproxy
+# edit config file
+server_config=\
+"
+frontend  onyeebube-frontend
+        bind *:80
+        mode http
+        default_backend onyeebube-backend
+backend onyeebube-backend
+        balance roundrobin
+        server 90771-web-01 100.25.33.39:80 check
+        server 90771-web-02 18.234.145.99:80 check
+"
+echo "$server_config" | sudo tee -a /etc/haproxy/haproxy.cfg
 
-# Configure HAProxy
-sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
-sudo cat <<EOT > /etc/haproxy/haproxy.cfg
-global
-    log /dev/log    local0
-    log /dev/log    local1 notice
-    chroot /var/lib/haproxy
-    stats socket /run/haproxy/admin.sock mode 660 level admin
-    stats timeout 30s
-    user haproxy
-    group haproxy
-    daemon
+# enable haproxy to be started by init script
 
-defaults
-    log     global
-    mode    http
-    option  httplog
-    option  dontlognull
-    timeout connect 5000
-    timeout client  50000
-    timeout server  50000
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
 
-frontend http-in
-    bind *:80
-    default_backend servers
-
-backend servers
-    balance roundrobin
-    server web-01 100.25.33.39-web-01:80 check
-    server web-02 18.234.145.99-web-02:80 check
-EOT
-
-# Enable HAProxy service
-sudo systemctl enable haproxy.service
-
-# Restart HAProxy service
-sudo systemctl restart haproxy.service
+sudo service haproxy restart
