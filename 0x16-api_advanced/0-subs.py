@@ -6,6 +6,7 @@ for a given subreddit
 import requests
 from requests import get
 
+
 def number_of_subscribers(subreddit):
     """
     If an invalid subreddit is given, the function returns 0
