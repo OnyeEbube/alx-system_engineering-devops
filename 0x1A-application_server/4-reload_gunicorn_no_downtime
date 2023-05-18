@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Get the process IDs of the Gunicorn master and workers
+MASTER_PID=$(pgrep -f "gunicorn: master")
+WORKER_PIDS=$(pgrep -f "gunicorn: worker")
+
+# Reload Gunicorn by sending a SIGHUP signal to the master process
+kill -s SIGHUP $MASTER_PID
+
+# Wait for the new workers to start
+sleep 5
+
+# Gracefully shut down the old workers one by one
+for pid in $WORKER_PIDS; do
+  kill -s TERM $pid
+  sleep 2
+done
+
+echo "Gunicorn reloaded gracefully"
