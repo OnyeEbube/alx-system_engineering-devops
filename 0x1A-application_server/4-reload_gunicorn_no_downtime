@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # Get the process IDs of the Gunicorn master and workers
 MASTER_PID=$(pgrep -f "gunicorn: master")
 WORKER_PIDS=$(pgrep -f "gunicorn: worker")
